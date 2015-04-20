@@ -10,9 +10,9 @@
   "homepage": "https://github.com/croquiscom/cmsx",
   "bugs": "https://github.com/croquiscom/cmsx/issues",
   "author": "Sangmin Yoon <sangmin.yoon@croquis.com>",
-  "licenses": "MIT",
+  "license": "MIT",
   "bin": {
-    "mjsx": "./bin/mjsx"
+    "cmsx": "./bin/cmsx"
   },
   "scripts": {
     "build": "coffee -c -o lib src"
