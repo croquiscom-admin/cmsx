@@ -195,7 +195,7 @@ joinList = (items) ->
     else
       output = items[i]+', '+output
     i--
-  output?.replace(/^[\n\s]+/, '') or ''
+  output?.replace(/^[\n\s]+/, '').replace(/[\n\s]+$/, '') or ''
 
 
 SPACES_ONLY = /^\s+$/

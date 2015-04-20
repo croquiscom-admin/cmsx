@@ -114,11 +114,8 @@ multiple line escaped coffeescript with nested cmsx
   for n in a
     {tag: "div", attrs: {}, children: [""" a
       asf
-""", {tag: "li", attrs: {"xy": ("as")}, children: [( n+1 ), {tag: "a", attrs: {}, children: []}, " ", {tag: "a", attrs: {}, children: []}, " "]}
-    ]}
-)
-
-]}
+""", {tag: "li", attrs: {"xy": ("as")}, children: [( n+1 ), {tag: "a", attrs: {}, children: []}, " ", {tag: "a", attrs: {}, children: []}, " "]}]}
+)]}
 ##end
 
 
@@ -129,8 +126,7 @@ nested cmsx within an attribute, with object attr value
   <Person name={<NameComponent attr3={ {'a': {}, b: '{'} } />} />
 </Company>
 ##expected
-{tag: "Company", attrs: {}, children: [{tag: "Person", attrs: {"name": ({tag: "NameComponent", attrs: {"attr3": ( {'a': {}, b: '{'} )}, children: []})}, children: []}
-]}
+{tag: "Company", attrs: {}, children: [{tag: "Person", attrs: {"name": ({tag: "NameComponent", attrs: {"attr3": ( {'a': {}, b: '{'} )}, children: []})}, children: []}]}
 ##end
 
 ##desc
@@ -175,8 +171,7 @@ escaped coffeescript with nested object literals
 {tag: "Person", attrs: {}, children: ["""
   blah blah blah """, (
     {'a' : {}, 'asd': 'asd'}
-  )
-]}
+  )]}
 ##end
 
 ##desc
@@ -201,8 +196,7 @@ HelloWorld.view = (ctrl) ->
 HelloWorld.view = (ctrl) ->
   {tag: "p", attrs: {}, children: ["""
     Hello, """, {tag: "input", attrs: {"type": "text", "placeholder": "Your name here"}, children: []}, """!
-    It is """, (ctrl.date().toTimeString())
-  ]}
+    It is """, (ctrl.date().toTimeString())]}
 ##end
 
 ##desc
@@ -248,11 +242,7 @@ multiline elements
   )
   }, children: [{tag: "div", attrs: {}, children: [{tag: "div", attrs: {}, children: [{tag: "div", attrs: {}, children: [{tag: "article", attrs: {"name": ( new Date() ), "number": 203,  \
      "range": (getRange())
-    }, children: []}
-  ]}
-  ]}
-  ]}
-  ]}
+    }, children: []}]}]}]}]}
 ##end
 
 
@@ -425,8 +415,7 @@ cs comment at start of cjsx escape
 ##expected
 {tag: "Person", attrs: {}, children: [(# i am a comment
   "i am a string"
-)
-]}
+)]}
 ##end
 
 ##desc
@@ -512,8 +501,7 @@ coffeescript @ syntax in tag name
   <Component />
 </@Component>
 ##expected
-{tag: "@Component", attrs: {}, children: [{tag: "Component", attrs: {}, children: []}
-]}
+{tag: "@Component", attrs: {}, children: [{tag: "Component", attrs: {}, children: []}]}
 ##end
 
 
