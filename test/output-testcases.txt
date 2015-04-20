@@ -1,0 +1,538 @@
+this file contains testcases
+anything within the blocks delimited by double-hash tags
+##like_this
+will be parsed into an object to be used as a testcase
+for example:
+##my_cool_block
+this text will be extracted verbatim. useful for testing code which
+processes text, when the exact characters of the input and output matter
+##end
+however, only configured tags will be matched. everything else will be discarded
+(including everything in this file so far)
+
+##desc
+self closing tag
+##input
+<Person />
+##expected
+{tag: "Person", attrs: {}, children: []}
+##end
+
+##desc
+ambigious tag-like expression
+##input
+x = a <b > c
+##expected
+x = a <b > c
+##end
+
+##desc
+ambigious tag
+##input
+x = a <b > c </b>
+##expected
+x = a {tag: "b", attrs: {}, children: [" c "]}
+##end
+
+##desc
+numeric bare attribute
+##input
+x = <table width=100 />
+##expected
+x = {tag: "table", attrs: {"width": 100}, children: []}
+##end
+
+##desc
+numeric escaped coffeescript attribute
+##input
+x = <table width={100} />
+##expected
+x = {tag: "table", attrs: {"width": (100)}, children: []}
+##end
+
+##desc
+string attribute
+##input
+x = <table width="100" />
+##expected
+x = {tag: "table", attrs: {"width": "100"}, children: []}
+##end
+
+##desc
+escaped coffeescript attribute
+##input
+<Person name={ if test() then 'yes' else 'no'} />
+##expected
+{tag: "Person", attrs: {"name": ( if test() then 'yes' else 'no')}, children: []}
+##end
+
+##desc
+escaped coffeescript attribute over multiple lines
+##input
+<Person name={
+  if test()
+    'yes'
+  else
+    'no'
+} />
+##expected
+{tag: "Person", attrs: {"name": (
+  if test()
+    'yes'
+  else
+    'no'
+)}, children: []}
+##end
+
+##desc
+multiple line escaped coffeescript with nested cmsx
+##input
+<Person name={
+  if test()
+    'yes'
+  else
+    'no'
+}>
+{
+
+  for n in a
+    <div> a
+      asf
+      <li xy={"as"}>{ n+1 }<a /> <a /> </li>
+    </div>
+}
+
+</Person>
+##expected
+{tag: "Person", attrs: {"name": (
+  if test()
+    'yes'
+  else
+    'no'
+)}, children: [(
+
+  for n in a
+    {tag: "div", attrs: {}, children: [""" a
+      asf
+""", {tag: "li", attrs: {"xy": ("as")}, children: [( n+1 ), {tag: "a", attrs: {}, children: []}, " ", {tag: "a", attrs: {}, children: []}, " "]}
+    ]}
+)
+
+]}
+##end
+
+
+##desc
+nested cmsx within an attribute, with object attr value
+##input
+<Company>
+  <Person name={<NameComponent attr3={ {'a': {}, b: '{'} } />} />
+</Company>
+##expected
+{tag: "Company", attrs: {}, children: [{tag: "Person", attrs: {"name": ({tag: "NameComponent", attrs: {"attr3": ( {'a': {}, b: '{'} )}, children: []})}, children: []}
+]}
+##end
+
+##desc
+complex nesting
+##input
+<div code={someFunc({a:{b:{}, C:'}{}{'}})} />
+##expected
+{tag: "div", attrs: {"code": (someFunc({a:{b:{}, C:'}{}{'}}))}, children: []}
+##end
+
+##desc
+multiline tag with nested cmsx within an attribute
+##input
+<Person
+  name={
+    name = formatName(user.name)
+    <NameComponent name={name.toUppercase()} />
+  }
+>
+  blah blah blah
+</Person>
+##expected
+{tag: "Person", attrs: { \
+  "name": (
+    name = formatName(user.name)
+    {tag: "NameComponent", attrs: {"name": (name.toUppercase())}, children: []}
+  )
+}, children: ["""
+  blah blah blah
+"""]}
+##end
+
+##desc
+escaped coffeescript with nested object literals
+##input
+<Person>
+  blah blah blah {
+    {'a' : {}, 'asd': 'asd'}
+  }
+</Person>
+##expected
+{tag: "Person", attrs: {}, children: ["""
+  blah blah blah """, (
+    {'a' : {}, 'asd': 'asd'}
+  )
+]}
+##end
+
+##desc
+multiline tag attributes with escaped coffeescript
+##input
+<Person name={if isActive() then 'active' else 'inactive'}
+someattr='on new line' />
+##expected
+{tag: "Person", attrs: {"name": (if isActive() then 'active' else 'inactive'),  \
+"someattr": 'on new line'}, children: []}
+##end
+
+##desc
+example react class with cmsx, text and escaped coffeescript
+##input
+HelloWorld.view = (ctrl) ->
+  <p>
+    Hello, <input type="text" placeholder="Your name here" />!
+    It is {ctrl.date().toTimeString()}
+  </p>
+##expected
+HelloWorld.view = (ctrl) ->
+  {tag: "p", attrs: {}, children: ["""
+    Hello, """, {tag: "input", attrs: {"type": "text", "placeholder": "Your name here"}, children: []}, """!
+    It is """, (ctrl.date().toTimeString())
+  ]}
+##end
+
+##desc
+lots of attributes
+##input
+
+<Person eyes=2 friends={getFriends()} popular = "yes"
+active={ if isActive() then 'active' else 'inactive' } data-attr='works' checked check=me_out
+/>
+##expected
+
+{tag: "Person", attrs: {"eyes": 2, "friends": (getFriends()), "popular": "yes",  \
+"active": ( if isActive() then 'active' else 'inactive' ), "data-attr": 'works', "checked": true, "check": me_out
+}, children: []}
+##end
+
+
+##desc
+multiline elements
+##input
+  <div something={
+    do ->
+      test = /432/gm # this is a regex
+      6 /432/gm # this is division
+  }
+  >
+  <div>
+  <div>
+  <div>
+    <article name={ new Date() } number = 203
+     range={getRange()}
+    >
+    </article>
+  </div>
+  </div>
+  </div>
+  </div>
+##expected
+  {tag: "div", attrs: {"something": (
+    do ->
+      test = /432/gm # this is a regex
+      6 /432/gm # this is division
+  )
+  }, children: [{tag: "div", attrs: {}, children: [{tag: "div", attrs: {}, children: [{tag: "div", attrs: {}, children: [{tag: "article", attrs: {"name": ( new Date() ), "number": 203,  \
+     "range": (getRange())
+    }, children: []}
+  ]}
+  ]}
+  ]}
+  ]}
+##end
+
+
+
+##desc
+comment
+##input
+# <Person />
+##expected
+# <Person />
+##end
+
+##desc
+herecomment
+##input
+###
+<Person />
+###
+##expected
+###
+<Person />
+###
+##end
+
+##desc
+regex
+##input
+/<Person \/>/
+##expected
+/<Person \/>/
+##end
+
+##desc
+complex regex
+##input
+<Person />
+/\/\/<Person \/>\>\//
+##expected
+{tag: "Person", attrs: {}, children: []}
+/\/\/<Person \/>\>\//
+##end
+
+
+##desc
+heregex
+##input
+test = /432/gm # this is a regex
+6 /432/gm # this is division
+<Tag>
+{test = /<Tag>/} <--this is a regex containing something which looks like a tag
+</Tag>
+<Person />
+REGEX = /// ^
+  (/ (?! [\s=] )   # comment comment <comment>comment</comment>
+  [^ [ / \n \\ ]*  # comment comment
+  (?:
+    <Tag />
+    (?: \\[\s\S]   # comment comment
+      | \[         # comment comment
+           [^ \] \n \\ ]*
+           (?: \\[\s\S] [^ \] \n \\ ]* )*
+           <Tag>tag</Tag>
+         ]
+    ) [^ [ / \n \\ ]*
+  )*
+  /) ([imgy]{0,4}) (?!\w)
+///
+<Person />
+##expected
+test = /432/gm # this is a regex
+6 /432/gm # this is division
+{tag: "Tag", attrs: {}, children: [(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
+"""]}
+{tag: "Person", attrs: {}, children: []}
+REGEX = /// ^
+  (/ (?! [\s=] )   # comment comment <comment>comment</comment>
+  [^ [ / \n \\ ]*  # comment comment
+  (?:
+    <Tag />
+    (?: \\[\s\S]   # comment comment
+      | \[         # comment comment
+           [^ \] \n \\ ]*
+           (?: \\[\s\S] [^ \] \n \\ ]* )*
+           <Tag>tag</Tag>
+         ]
+    ) [^ [ / \n \\ ]*
+  )*
+  /) ([imgy]{0,4}) (?!\w)
+///
+{tag: "Person", attrs: {}, children: []}
+##end
+
+##desc
+js escaped
+##input
+`<Person />`
+##expected
+`<Person />`
+##end
+
+##desc
+string single quote
+##input
+'<Person />'
+##expected
+'<Person />'
+##end
+
+##desc
+string double quote
+##input
+"<Person />"
+##expected
+"<Person />"
+##end
+
+##desc
+string triple single quote
+##input
+'''<Person />'''
+##expected
+'''<Person />'''
+##end
+
+##desc
+string triple double quote
+##input
+"""<Person />"""
+##expected
+"""<Person />"""
+##end
+
+##desc
+escaped js within cjsx is ignored by parser
+##input
+<Person> `i am not js` </Person>
+##expected
+{tag: "Person", attrs: {}, children: [" `i am not js` "]}
+##end
+
+##desc
+comment within cjsx is ignored by parser
+##input
+<Person>
+# i am not a comment
+</Person>
+##expected
+{tag: "Person", attrs: {}, children: ["""
+# i am not a comment
+"""]}
+##end
+
+##desc
+empty node is handled as expected
+##input
+<Person>
+</Person>
+##expected
+{tag: "Person", attrs: {}, children: []}
+##end
+
+##desc
+cs comment at start of cjsx escape
+##input
+<Person>
+{# i am a comment
+  "i am a string"
+}
+</Person>
+##expected
+{tag: "Person", attrs: {}, children: [(# i am a comment
+  "i am a string"
+)
+]}
+##end
+
+##desc
+cjsx comment is passed through
+##input
+<Person>
+{# i am a comment}
+</Person>
+##expected
+{tag: "Person", attrs: {}, children: []}
+##end
+
+##desc
+comment syntax can be used inline
+##input
+<Person>{#comment inline}</Person>
+##expected
+{tag: "Person", attrs: {}, children: []}
+##end
+
+##desc
+string within cjsx is ignored by parser and escaped
+##input
+<Person> "i am not a string" 'nor am i' </Person>
+##expected
+{tag: "Person", attrs: {}, children: [" \"i am not a string\" \'nor am i\' "]}
+##end
+
+##desc
+special chars within cjsx are ignored by parser and escaped
+##input
+<Person> a,/';][' a\''@$%^&˚¬∑˜˚∆å∂¬˚*()*&^%$>><<<< '"''"'''\'\'m' i </Person>
+##expected
+{tag: "Person", attrs: {}, children: [" a,\x2F\';][\' a\\\'\'@$%^\&\u02da\u00ac\u2211\u02dc\u02da\u2206\u00e5\u2202\u00ac\u02da*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "]}
+##end
+
+##desc
+html entities (name, decimal, hex) within cjsx decoded
+##input
+<Person>  &&&&euro;  &#8364; &#x20AC;;; </Person>
+##expected
+{tag: "Person", attrs: {}, children: ["  \&\&\&\u20ac  \u20ac \u20ac;; "]}
+##end
+
+##desc
+tag with {{}}
+##input
+<Person name={{value: item, key, item}} />
+##expected
+{tag: "Person", attrs: {"name": ({value: item, key, item})}, children: []}
+##end
+
+##desc
+tag with namespace
+##input
+<Something.Tag></Something.Tag>
+##expected
+{tag: "Something.Tag", attrs: {}, children: []}
+##end
+
+##desc
+self closing tag with namespace
+##input
+<Something.Tag />
+##expected
+{tag: "Something.Tag", attrs: {}, children: []}
+##end
+
+##desc
+Empty strings are not converted to true
+##input
+<Component val='' />
+<Component val="" />
+##expected
+{tag: "Component", attrs: {"val": ''}, children: []}
+{tag: "Component", attrs: {"val": ""}, children: []}
+##end
+
+##desc
+coffeescript @ syntax in tag name
+##input
+<@Component>
+  <Component />
+</@Component>
+##expected
+{tag: "@Component", attrs: {}, children: [{tag: "Component", attrs: {}, children: []}
+]}
+##end
+
+
+##desc
+custom element
+##input
+<paper-button className="button">{text}</paper-button>
+##expected
+{tag: "paper-button", attrs: {"className": "button"}, children: [(text)]}
+##end
+
+##desc
+literate cjsx
+##input
+Don't get caught out by apostrophes.
+
+    console.log <A />
+##expected
+# Don't get caught out by apostrophes.
+
+    console.log {tag: "A", attrs: {}, children: []}
+##end

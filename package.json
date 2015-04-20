@@ -1,0 +1,29 @@
+{
+  "name": "cmsx",
+  "description": "CoffeeScript MSX Transformer",
+  "version": "0.1.0",
+  "keywords": [
+    "coffeescript",
+    "mithril",
+    "msx"
+  ],
+  "homepage": "https://github.com/croquiscom/cmsx",
+  "bugs": "https://github.com/croquiscom/cmsx/issues",
+  "author": "Sangmin Yoon <sangmin.yoon@croquis.com>",
+  "licenses": "MIT",
+  "bin": {
+    "mjsx": "./bin/mjsx"
+  },
+  "scripts": {
+    "build": "coffee -c -o lib src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/croquiscom/cmsx.git"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.9.1",
+    "colors": "^0.6.2",
+    "diff": "^1.0.8"
+  }
+}
