@@ -376,7 +376,7 @@ string triple double quote
 ##end
 
 ##desc
-escaped js within cjsx is ignored by parser
+escaped js within cmsx is ignored by parser
 ##input
 <Person> `i am not js` </Person>
 ##expected
@@ -384,7 +384,7 @@ m.component(Person, {}, [" `i am not js` "])
 ##end
 
 ##desc
-comment within cjsx is ignored by parser
+comment within cmsx is ignored by parser
 ##input
 <Person>
 # i am not a comment
@@ -405,7 +405,7 @@ Person
 ##end
 
 ##desc
-cs comment at start of cjsx escape
+cs comment at start of cmsx escape
 ##input
 <Person>
 {# i am a comment
@@ -419,7 +419,7 @@ m.component(Person, {}, [(# i am a comment
 ##end
 
 ##desc
-cjsx comment is passed through
+cmsx comment is passed through
 ##input
 <Person>
 {# i am a comment}
@@ -437,7 +437,7 @@ Person
 ##end
 
 ##desc
-string within cjsx is ignored by parser and escaped
+string within cmsx is ignored by parser and escaped
 ##input
 <Person> "i am not a string" 'nor am i' </Person>
 ##expected
@@ -445,7 +445,7 @@ m.component(Person, {}, [" \"i am not a string\" \'nor am i\' "])
 ##end
 
 ##desc
-special chars within cjsx are ignored by parser and escaped
+special chars within cmsx are ignored by parser and escaped
 ##input
 <Person> a,/';][' a\''@$%^&˚¬∑˜˚∆å∂¬˚*()*&^%$>><<<< '"''"'''\'\'m' i </Person>
 ##expected
@@ -453,7 +453,7 @@ m.component(Person, {}, [" a,\x2F\';][\' a\\\'\'@$%^\&\u02da\u00ac\u2211\u02dc\u
 ##end
 
 ##desc
-html entities (name, decimal, hex) within cjsx decoded
+html entities (name, decimal, hex) within cmsx decoded
 ##input
 <Person>  &&&&euro;  &#8364; &#x20AC;;; </Person>
 ##expected
@@ -514,7 +514,7 @@ custom element
 ##end
 
 ##desc
-literate cjsx
+literate cmsx
 ##input
 Don't get caught out by apostrophes.
 
