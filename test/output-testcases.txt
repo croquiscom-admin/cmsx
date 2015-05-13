@@ -15,7 +15,7 @@ self closing tag
 ##input
 <Person />
 ##expected
-{tag: "Person", attrs: {}, children: []}
+Person
 ##end
 
 ##desc
@@ -63,7 +63,7 @@ escaped coffeescript attribute
 ##input
 <Person name={ if test() then 'yes' else 'no'} />
 ##expected
-{tag: "Person", attrs: {"name": ( if test() then 'yes' else 'no')}, children: []}
+m.component(Person, {"name": ( if test() then 'yes' else 'no')})
 ##end
 
 ##desc
@@ -76,12 +76,12 @@ escaped coffeescript attribute over multiple lines
     'no'
 } />
 ##expected
-{tag: "Person", attrs: {"name": (
+m.component(Person, {"name": (
   if test()
     'yes'
   else
     'no'
-)}, children: []}
+)})
 ##end
 
 ##desc
@@ -104,18 +104,18 @@ multiple line escaped coffeescript with nested cmsx
 
 </Person>
 ##expected
-{tag: "Person", attrs: {"name": (
+m.component(Person, {"name": (
   if test()
     'yes'
   else
     'no'
-)}, children: [(
+)}, [(
 
   for n in a
     {tag: "div", attrs: {}, children: [""" a
       asf
 """, {tag: "li", attrs: {"xy": ("as")}, children: [( n+1 ), {tag: "a", attrs: {}, children: []}, " ", {tag: "a", attrs: {}, children: []}, " "]}]}
-)]}
+)])
 ##end
 
 
@@ -126,7 +126,7 @@ nested cmsx within an attribute, with object attr value
   <Person name={<NameComponent attr3={ {'a': {}, b: '{'} } />} />
 </Company>
 ##expected
-{tag: "Company", attrs: {}, children: [{tag: "Person", attrs: {"name": ({tag: "NameComponent", attrs: {"attr3": ( {'a': {}, b: '{'} )}, children: []})}, children: []}]}
+m.component(Company, {}, [m.component(Person, {"name": (m.component(NameComponent, {"attr3": ( {'a': {}, b: '{'} )}))})])
 ##end
 
 ##desc
@@ -149,14 +149,14 @@ multiline tag with nested cmsx within an attribute
   blah blah blah
 </Person>
 ##expected
-{tag: "Person", attrs: { \
+m.component(Person, { \
   "name": (
     name = formatName(user.name)
-    {tag: "NameComponent", attrs: {"name": (name.toUppercase())}, children: []}
+    m.component(NameComponent, {"name": (name.toUppercase())})
   )
-}, children: ["""
+}, ["""
   blah blah blah
-"""]}
+"""])
 ##end
 
 ##desc
@@ -168,10 +168,10 @@ escaped coffeescript with nested object literals
   }
 </Person>
 ##expected
-{tag: "Person", attrs: {}, children: ["""
+m.component(Person, {}, ["""
   blah blah blah """, (
     {'a' : {}, 'asd': 'asd'}
-  )]}
+  )])
 ##end
 
 ##desc
@@ -180,8 +180,8 @@ multiline tag attributes with escaped coffeescript
 <Person name={if isActive() then 'active' else 'inactive'}
 someattr='on new line' />
 ##expected
-{tag: "Person", attrs: {"name": (if isActive() then 'active' else 'inactive'),  \
-"someattr": 'on new line'}, children: []}
+m.component(Person, {"name": (if isActive() then 'active' else 'inactive'),  \
+"someattr": 'on new line'})
 ##end
 
 ##desc
@@ -208,9 +208,9 @@ active={ if isActive() then 'active' else 'inactive' } data-attr='works' checked
 />
 ##expected
 
-{tag: "Person", attrs: {"eyes": 2, "friends": (getFriends()), "popular": "yes",  \
+m.component(Person, {"eyes": 2, "friends": (getFriends()), "popular": "yes",  \
 "active": ( if isActive() then 'active' else 'inactive' ), "data-attr": 'works', "checked": true, "check": me_out
-}, children: []}
+})
 ##end
 
 
@@ -281,7 +281,7 @@ complex regex
 <Person />
 /\/\/<Person \/>\>\//
 ##expected
-{tag: "Person", attrs: {}, children: []}
+Person
 /\/\/<Person \/>\>\//
 ##end
 
@@ -314,9 +314,9 @@ REGEX = /// ^
 ##expected
 test = /432/gm # this is a regex
 6 /432/gm # this is division
-{tag: "Tag", attrs: {}, children: [(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
-"""]}
-{tag: "Person", attrs: {}, children: []}
+m.component(Tag, {}, [(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
+"""])
+Person
 REGEX = /// ^
   (/ (?! [\s=] )   # comment comment <comment>comment</comment>
   [^ [ / \n \\ ]*  # comment comment
@@ -332,7 +332,7 @@ REGEX = /// ^
   )*
   /) ([imgy]{0,4}) (?!\w)
 ///
-{tag: "Person", attrs: {}, children: []}
+Person
 ##end
 
 ##desc
@@ -380,7 +380,7 @@ escaped js within cjsx is ignored by parser
 ##input
 <Person> `i am not js` </Person>
 ##expected
-{tag: "Person", attrs: {}, children: [" `i am not js` "]}
+m.component(Person, {}, [" `i am not js` "])
 ##end
 
 ##desc
@@ -390,9 +390,9 @@ comment within cjsx is ignored by parser
 # i am not a comment
 </Person>
 ##expected
-{tag: "Person", attrs: {}, children: ["""
+m.component(Person, {}, ["""
 # i am not a comment
-"""]}
+"""])
 ##end
 
 ##desc
@@ -401,7 +401,7 @@ empty node is handled as expected
 <Person>
 </Person>
 ##expected
-{tag: "Person", attrs: {}, children: []}
+Person
 ##end
 
 ##desc
@@ -413,9 +413,9 @@ cs comment at start of cjsx escape
 }
 </Person>
 ##expected
-{tag: "Person", attrs: {}, children: [(# i am a comment
+m.component(Person, {}, [(# i am a comment
   "i am a string"
-)]}
+)])
 ##end
 
 ##desc
@@ -425,7 +425,7 @@ cjsx comment is passed through
 {# i am a comment}
 </Person>
 ##expected
-{tag: "Person", attrs: {}, children: []}
+Person
 ##end
 
 ##desc
@@ -433,7 +433,7 @@ comment syntax can be used inline
 ##input
 <Person>{#comment inline}</Person>
 ##expected
-{tag: "Person", attrs: {}, children: []}
+Person
 ##end
 
 ##desc
@@ -441,7 +441,7 @@ string within cjsx is ignored by parser and escaped
 ##input
 <Person> "i am not a string" 'nor am i' </Person>
 ##expected
-{tag: "Person", attrs: {}, children: [" \"i am not a string\" \'nor am i\' "]}
+m.component(Person, {}, [" \"i am not a string\" \'nor am i\' "])
 ##end
 
 ##desc
@@ -449,7 +449,7 @@ special chars within cjsx are ignored by parser and escaped
 ##input
 <Person> a,/';][' a\''@$%^&˚¬∑˜˚∆å∂¬˚*()*&^%$>><<<< '"''"'''\'\'m' i </Person>
 ##expected
-{tag: "Person", attrs: {}, children: [" a,\x2F\';][\' a\\\'\'@$%^\&\u02da\u00ac\u2211\u02dc\u02da\u2206\u00e5\u2202\u00ac\u02da*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "]}
+m.component(Person, {}, [" a,\x2F\';][\' a\\\'\'@$%^\&\u02da\u00ac\u2211\u02dc\u02da\u2206\u00e5\u2202\u00ac\u02da*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "])
 ##end
 
 ##desc
@@ -457,7 +457,7 @@ html entities (name, decimal, hex) within cjsx decoded
 ##input
 <Person>  &&&&euro;  &#8364; &#x20AC;;; </Person>
 ##expected
-{tag: "Person", attrs: {}, children: ["  \&\&\&\u20ac  \u20ac \u20ac;; "]}
+m.component(Person, {}, ["  \&\&\&\u20ac  \u20ac \u20ac;; "])
 ##end
 
 ##desc
@@ -465,7 +465,7 @@ tag with {{}}
 ##input
 <Person name={{value: item, key, item}} />
 ##expected
-{tag: "Person", attrs: {"name": ({value: item, key, item})}, children: []}
+m.component(Person, {"name": ({value: item, key, item})})
 ##end
 
 ##desc
@@ -473,7 +473,7 @@ tag with namespace
 ##input
 <Something.Tag></Something.Tag>
 ##expected
-{tag: "Something.Tag", attrs: {}, children: []}
+Something.Tag
 ##end
 
 ##desc
@@ -481,7 +481,7 @@ self closing tag with namespace
 ##input
 <Something.Tag />
 ##expected
-{tag: "Something.Tag", attrs: {}, children: []}
+Something.Tag
 ##end
 
 ##desc
@@ -490,8 +490,8 @@ Empty strings are not converted to true
 <Component val='' />
 <Component val="" />
 ##expected
-{tag: "Component", attrs: {"val": ''}, children: []}
-{tag: "Component", attrs: {"val": ""}, children: []}
+m.component(Component, {"val": ''})
+m.component(Component, {"val": ""})
 ##end
 
 ##desc
@@ -501,7 +501,7 @@ coffeescript @ syntax in tag name
   <Component />
 </@Component>
 ##expected
-{tag: "@Component", attrs: {}, children: [{tag: "Component", attrs: {}, children: []}]}
+m.component(@Component, {}, [Component])
 ##end
 
 
@@ -522,5 +522,5 @@ Don't get caught out by apostrophes.
 ##expected
 # Don't get caught out by apostrophes.
 
-    console.log {tag: "A", attrs: {}, children: []}
+    console.log A
 ##end

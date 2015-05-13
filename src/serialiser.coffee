@@ -11,7 +11,7 @@ module.exports = exports = serialise = (parseTree) ->
   new Serialiser().serialise(parseTree)
 
 class Serialiser
-  serialise: (parseTree, @opts = {}) ->
+  serialise: (parseTree) ->
     if parseTree.children and
     parseTree.children.length and
     parseTree.children[0].type is $.CJSX_PRAGMA
@@ -107,8 +107,20 @@ nodeSerialisers =
       serialisedChildren[serialisedChildren.length-1] += accumulatedWhitespace
       accumulatedWhitespace = ''
 
-    element = '"'+node.value+'"'
-    "{tag: #{element}, attrs: #{serialisedAttribute}, children: [#{joinList(serialisedChildren)}]}"
+    # from react-tools/vendor/fbtransform/transforms/react.js
+    # Identifiers with lower case or hypthens are fallback tags (strings).
+    if tagConvention.test(node.value)
+      element = '"'+node.value+'"'
+      "{tag: #{element}, attrs: #{serialisedAttribute}, children: [#{joinList(serialisedChildren)}]}"
+    else
+      element = node.value
+      if serialisedChildren.length is 0
+        if serialisedAttribute is '{}'
+          element
+        else
+          "m.component(#{element}, #{serialisedAttribute})"
+      else
+        "m.component(#{element}, #{serialisedAttribute}, [#{joinList(serialisedChildren)}])"
 
   CJSX_COMMENT: (node) ->
     ''
