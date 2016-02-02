@@ -15,7 +15,8 @@
     "cmsx": "./bin/cmsx"
   },
   "scripts": {
-    "build": "coffee -c -o lib src"
+    "build": "coffee -c -o lib src",
+    "test": "coffee test/test.coffee"
   },
   "repository": {
     "type": "git",
