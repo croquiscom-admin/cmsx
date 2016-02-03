@@ -449,7 +449,7 @@ special chars within cmsx are ignored by parser and escaped
 ##input
 <Person> a,/';][' a\''@$%^&˚¬∑˜˚∆å∂¬˚*()*&^%$>><<<< '"''"'''\'\'m' i </Person>
 ##expected
-m.component(Person, {}, [" a,\x2F\';][\' a\\\'\'@$%^\&\u02da\u00ac\u2211\u02dc\u02da\u2206\u00e5\u2202\u00ac\u02da*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "])
+m.component(Person, {}, [" a,\x2F\';][\' a\\\'\'@$%^\&˚¬∑˜˚∆å∂¬˚*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "])
 ##end
 
 ##desc
@@ -457,7 +457,7 @@ html entities (name, decimal, hex) within cmsx decoded
 ##input
 <Person>  &&&&euro;  &#8364; &#x20AC;;; </Person>
 ##expected
-m.component(Person, {}, ["  \&\&\&\u20ac  \u20ac \u20ac;; "])
+m.component(Person, {}, ["  \&\&\&€  € €;; "])
 ##end
 
 ##desc
@@ -474,6 +474,14 @@ tag with namespace
 <Something.Tag></Something.Tag>
 ##expected
 Something.Tag
+##end
+
+##desc
+tag with lowercase namespace
+##input
+<something.tag></something.tag>
+##expected
+something.tag
 ##end
 
 ##desc

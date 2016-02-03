@@ -52,15 +52,15 @@ class Serialiser
         pairAttrsBuffer = [] # reset buffer
 
     # okay this is pretty gross. once source maps are up and running all of the
-    # whitespace related bs can be nuked as there will no longer be a need to
-    # torture the CS syntax to maintain whitespace and output the same number
-    # of lines while also transforming syntax. however in the mean time, this is
+    # whitespace related bs can be nuked as there will no longer be a need to 
+    # torture the CS syntax to maintain whitespace and output the same number 
+    # of lines while also transforming syntax. however in the mean time, this is 
     # what we're doing.
 
-    # this code rewrites attr pair, spread, etc nodes into CS (code fragment)
-    # and whitespace nodes. then they are serialised and joined with whitespace
+    # this code rewrites attr pair, spread, etc nodes into CS (code fragment) 
+    # and whitespace nodes. then they are serialised and joined with whitespace 
     # maintained, and newlines escaped (except at the end of an args list)
-
+    
     # initial object assign arg
     if firstNonWhitespaceChild(children)?.type is $.CJSX_ATTR_SPREAD
       assigns.push(type: $.CS, value: '{}')
@@ -146,7 +146,7 @@ genericBranchSerialiser = (node) ->
 
 genericLeafSerialiser = (node) -> node.value
 
-tagConvention = /^[a-z]|\-/
+componentClassTagConvention = /(^[A-Z@]|\.)/
 
 nodeSerialisers =
   ROOT: genericBranchSerialiser
@@ -173,12 +173,10 @@ nodeSerialisers =
       serialisedChildren[serialisedChildren.length-1] += accumulatedWhitespace
       accumulatedWhitespace = ''
 
-    # from react-tools/vendor/fbtransform/transforms/react.js
-    # Identifiers with lower case or hypthens are fallback tags (strings).
-    if tagConvention.test(node.value)
-      element = '"'+node.value+'"'
-      "{tag: #{element}, attrs: #{serialisedAttribute}, children: [#{joinList(serialisedChildren)}]}"
-    else
+    # Identifiers which start with an upper case letter, @, or contain a dot 
+    # (property access) are component classes. Everything else is treated as a 
+    # DOM/custom element, and output as a name string.
+    if componentClassTagConvention.test(node.value)
       element = node.value
       if serialisedChildren.length is 0
         if serialisedAttribute is '{}'
@@ -187,6 +185,9 @@ nodeSerialisers =
           "m.component(#{element}, #{serialisedAttribute})"
       else
         "m.component(#{element}, #{serialisedAttribute}, [#{joinList(serialisedChildren)}])"
+    else
+      element = '"'+node.value+'"'
+      "{tag: #{element}, attrs: #{serialisedAttribute}, children: [#{joinList(serialisedChildren)}]}"
 
   CJSX_COMMENT: (node) ->
     ''
