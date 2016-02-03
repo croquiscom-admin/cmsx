@@ -32,6 +32,72 @@ class Serialiser
 
     serialised
 
+  serialiseSpreadAndPairAttributes: (children) ->
+    assigns = [] # nodes
+    pairAttrsBuffer = [] # nodes
+
+    flushPairs = =>
+      if pairAttrsBuffer.length
+        serialisedChild = @serialiseAttributePairs(pairAttrsBuffer)
+        if serialisedChild
+          assigns.push(type: $.CS, value: serialisedChild)
+        else
+          serialisedPairs = pairAttrsBuffer
+            .map((p) => @serialiseNode(p))
+            .join('')
+            # escaping newlines might create a syntax error if the newline is
+            # after the last arg in a list, so we'll fix it below
+            .replace('\n', '\\\n')
+          assigns.push(type: $.CJSX_WHITESPACE, value: serialisedPairs)
+        pairAttrsBuffer = [] # reset buffer
+
+    # okay this is pretty gross. once source maps are up and running all of the
+    # whitespace related bs can be nuked as there will no longer be a need to
+    # torture the CS syntax to maintain whitespace and output the same number
+    # of lines while also transforming syntax. however in the mean time, this is
+    # what we're doing.
+
+    # this code rewrites attr pair, spread, etc nodes into CS (code fragment)
+    # and whitespace nodes. then they are serialised and joined with whitespace
+    # maintained, and newlines escaped (except at the end of an args list)
+
+    # initial object assign arg
+    if firstNonWhitespaceChild(children)?.type is $.CJSX_ATTR_SPREAD
+      assigns.push(type: $.CS, value: '{}')
+
+    # group sets of attr pairs between spreads
+    for child, childIndex in children
+      if child.type is $.CJSX_ATTR_SPREAD
+        flushPairs()
+        assigns.push(type: $.CS, value: child.value)
+      else
+        pairAttrsBuffer.push(child)
+
+    # finally group any remaining pairs
+    flushPairs()
+
+    # serialising the rewritten nodes with whitespace maintained
+    accumulatedWhitespace = ''
+    assignsWithWhitespace = [] # serialised nodes texts
+    for assignItem, assignIndex in assigns
+      if assignItem?
+        if assignItem.type is $.CJSX_WHITESPACE
+          accumulatedWhitespace += @serialiseNode(assignItem)
+        else
+          assignsWithWhitespace.push(accumulatedWhitespace + @serialiseNode(assignItem))
+          accumulatedWhitespace = ''
+
+    if assignsWithWhitespace.length
+      lastAssignWithWhitespace = assignsWithWhitespace.pop()
+      # hack to fix potential syntax error when newlines are escaped after last arg
+      # TODO: kill this with fire once sourcemaps are available
+      trailingWhiteplace = accumulatedWhitespace.replace('\\\n', '\n')
+      assignsWithWhitespace.push(lastAssignWithWhitespace + trailingWhiteplace)
+
+    joinedAssigns = joinList(assignsWithWhitespace)
+
+    "Object.assign(#{joinedAssigns})"
+
   serialiseAttributePairs: (children) ->
     # whitespace (particularly newlines) must be maintained
     # to ensure line number parity
@@ -132,7 +198,10 @@ nodeSerialisers =
     '('+childrenSerialised+')'
 
   CJSX_ATTRIBUTES: (node) ->
-    @serialiseAttributePairs(node.children) or '{}'
+    if node.children.some((child) -> child.type is $.CJSX_ATTR_SPREAD)
+      @serialiseSpreadAndPairAttributes(node.children)
+    else
+      @serialiseAttributePairs(node.children) or '{}'
 
   CJSX_ATTR_PAIR: (node) ->
     node.children

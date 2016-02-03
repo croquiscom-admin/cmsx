@@ -485,6 +485,139 @@ Something.Tag
 ##end
 
 ##desc
+self closing tag with spread attribute
+##input
+<Component a={b} {... x } b="c" />
+##expected
+m.component(Component, Object.assign({"a": (b)},  x , {"b": "c"}))
+##end
+
+##desc
+complex spread attribute
+##input
+<Component {...x} a={b} {... x } b="c" {...$my_xtraCoolVar123 } />
+##expected
+m.component(Component, Object.assign({},  x, {"a": (b)},  x , {"b": "c"}, $my_xtraCoolVar123))
+##end
+
+##desc
+multiline spread attribute
+##input
+<Component {...
+  x } a={b} {... x } b="c" {...z }>
+</Component>
+##expected
+m.component(Component, Object.assign({},  
+  x , {"a": (b)},  x , {"b": "c"}, z))
+##end
+
+##desc
+multiline tag with spread attribute
+##input
+<Component
+  z="1"
+  {...x}
+  a={b}
+  b="c"
+>
+</Component>
+##expected
+m.component(Component, Object.assign({ \
+  "z": "1"
+  }, x, { \
+  "a": (b),  \
+  "b": "c"
+}))
+##end
+##desc
+multiline tag with spread attribute first
+##input
+<Component
+  {...
+  x}
+  z="1"
+  a={b}
+  b="c"
+>
+</Component>
+##expected
+m.component(Component, Object.assign({}, \
+  
+  x, { \
+  "z": "1",  \
+  "a": (b),  \
+  "b": "c"
+}))
+##end
+
+##desc
+complex multiline spread attribute
+##input
+<Component
+  {...
+  y} a={b} {... x } b="c" {...z }>
+  <div code={someFunc({a:{b:{}, C:'}'}})} />
+</Component>
+##expected
+m.component(Component, Object.assign({}, \
+  
+  y, {"a": (b)},  x , {"b": "c"}, z), [{tag: "div", attrs: {"code": (someFunc({a:{b:{}, C:'}'}}))}, children: []}])
+##end
+
+##desc
+self closing spread attribute on single line
+##input
+<Component a="b" c="d" {...@props} />
+##expected
+m.component(Component, Object.assign({"a": "b", "c": "d"}, @props))
+##end
+
+##desc
+self closing spread attribute on new line
+##input
+<Component
+  a="b"
+  c="d"
+  {...@props}
+/>
+##expected
+m.component(Component, Object.assign({ \
+  "a": "b",  \
+  "c": "d"
+  }, @props))
+##end
+
+##desc
+self closing spread attribute on same line
+##input
+<Component
+  a="b"
+  c="d"
+  {...@props} />
+##expected
+m.component(Component, Object.assign({ \
+  "a": "b",  \
+  "c": "d"
+  }, @props))
+##end
+
+##desc
+self closing spread attribute on next line
+##input
+<Component
+  a="b"
+  c="d"
+  {...@props}
+
+/>
+##expected
+m.component(Component, Object.assign({ \
+  "a": "b",  \
+  "c": "d"
+  }, @props))
+##end
+
+##desc
 Empty strings are not converted to true
 ##input
 <Component val='' />
