@@ -1,7 +1,7 @@
 {
   "name": "cmsx",
   "description": "CoffeeScript MSX Transformer",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "keywords": [
     "coffeescript",
     "mithril",
@@ -23,8 +23,8 @@
     "url": "git://github.com/croquiscom/cmsx.git"
   },
   "devDependencies": {
-    "coffee-script": "^1.9.1",
-    "colors": "^0.6.2",
-    "diff": "^1.0.8"
+    "coffee-script": "^1.11.1",
+    "colors": "^1.1.2",
+    "diff": "^3.0.1"
   }
 }
