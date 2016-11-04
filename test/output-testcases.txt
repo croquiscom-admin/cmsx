@@ -31,7 +31,7 @@ ambigious tag
 ##input
 x = a <b > c </b>
 ##expected
-x = a {tag: "b", attrs: {}, children: [" c "]}
+x = a m("b", {}, [" c "])
 ##end
 
 ##desc
@@ -39,7 +39,7 @@ numeric bare attribute
 ##input
 x = <table width=100 />
 ##expected
-x = {tag: "table", attrs: {"width": 100}, children: []}
+x = m("table", {"width": 100}, [])
 ##end
 
 ##desc
@@ -47,7 +47,7 @@ numeric escaped coffeescript attribute
 ##input
 x = <table width={100} />
 ##expected
-x = {tag: "table", attrs: {"width": (100)}, children: []}
+x = m("table", {"width": (100)}, [])
 ##end
 
 ##desc
@@ -55,7 +55,7 @@ string attribute
 ##input
 x = <table width="100" />
 ##expected
-x = {tag: "table", attrs: {"width": "100"}, children: []}
+x = m("table", {"width": "100"}, [])
 ##end
 
 ##desc
@@ -63,7 +63,7 @@ escaped coffeescript attribute
 ##input
 <Person name={ if test() then 'yes' else 'no'} />
 ##expected
-m.component(Person, {"name": ( if test() then 'yes' else 'no')})
+m(Person, {"name": ( if test() then 'yes' else 'no')})
 ##end
 
 ##desc
@@ -76,7 +76,7 @@ escaped coffeescript attribute over multiple lines
     'no'
 } />
 ##expected
-m.component(Person, {"name": (
+m(Person, {"name": (
   if test()
     'yes'
   else
@@ -104,7 +104,7 @@ multiple line escaped coffeescript with nested cmsx
 
 </Person>
 ##expected
-m.component(Person, {"name": (
+m(Person, {"name": (
   if test()
     'yes'
   else
@@ -112,9 +112,9 @@ m.component(Person, {"name": (
 )}, [(
 
   for n in a
-    {tag: "div", attrs: {}, children: [""" a
+    m("div", {}, [""" a
       asf
-""", {tag: "li", attrs: {"xy": ("as")}, children: [( n+1 ), {tag: "a", attrs: {}, children: []}, " ", {tag: "a", attrs: {}, children: []}, " "]}]}
+""", m("li", {"xy": ("as")}, [( n+1 ), m("a", {}, []), " ", m("a", {}, []), " "])])
 )])
 ##end
 
@@ -126,7 +126,7 @@ nested cmsx within an attribute, with object attr value
   <Person name={<NameComponent attr3={ {'a': {}, b: '{'} } />} />
 </Company>
 ##expected
-m.component(Company, {}, [m.component(Person, {"name": (m.component(NameComponent, {"attr3": ( {'a': {}, b: '{'} )}))})])
+m(Company, {}, [m(Person, {"name": (m(NameComponent, {"attr3": ( {'a': {}, b: '{'} )}))})])
 ##end
 
 ##desc
@@ -134,7 +134,7 @@ complex nesting
 ##input
 <div code={someFunc({a:{b:{}, C:'}{}{'}})} />
 ##expected
-{tag: "div", attrs: {"code": (someFunc({a:{b:{}, C:'}{}{'}}))}, children: []}
+m("div", {"code": (someFunc({a:{b:{}, C:'}{}{'}}))}, [])
 ##end
 
 ##desc
@@ -149,10 +149,10 @@ multiline tag with nested cmsx within an attribute
   blah blah blah
 </Person>
 ##expected
-m.component(Person, { \
+m(Person, { \
   "name": (
     name = formatName(user.name)
-    m.component(NameComponent, {"name": (name.toUppercase())})
+    m(NameComponent, {"name": (name.toUppercase())})
   )
 }, ["""
   blah blah blah
@@ -168,7 +168,7 @@ escaped coffeescript with nested object literals
   }
 </Person>
 ##expected
-m.component(Person, {}, ["""
+m(Person, {}, ["""
   blah blah blah """, (
     {'a' : {}, 'asd': 'asd'}
   )])
@@ -180,7 +180,7 @@ multiline tag attributes with escaped coffeescript
 <Person name={if isActive() then 'active' else 'inactive'}
 someattr='on new line' />
 ##expected
-m.component(Person, {"name": (if isActive() then 'active' else 'inactive'),  \
+m(Person, {"name": (if isActive() then 'active' else 'inactive'),  \
 "someattr": 'on new line'})
 ##end
 
@@ -194,9 +194,9 @@ HelloWorld.view = (ctrl) ->
   </p>
 ##expected
 HelloWorld.view = (ctrl) ->
-  {tag: "p", attrs: {}, children: ["""
-    Hello, """, {tag: "input", attrs: {"type": "text", "placeholder": "Your name here"}, children: []}, """!
-    It is """, (ctrl.date().toTimeString())]}
+  m("p", {}, ["""
+    Hello, """, m("input", {"type": "text", "placeholder": "Your name here"}, []), """!
+    It is """, (ctrl.date().toTimeString())])
 ##end
 
 ##desc
@@ -208,7 +208,7 @@ active={ if isActive() then 'active' else 'inactive' } data-attr='works' checked
 />
 ##expected
 
-m.component(Person, {"eyes": 2, "friends": (getFriends()), "popular": "yes",  \
+m(Person, {"eyes": 2, "friends": (getFriends()), "popular": "yes",  \
 "active": ( if isActive() then 'active' else 'inactive' ), "data-attr": 'works', "checked": true, "check": me_out
 })
 ##end
@@ -235,14 +235,14 @@ multiline elements
   </div>
   </div>
 ##expected
-  {tag: "div", attrs: {"something": (
+  m("div", {"something": (
     do ->
       test = /432/gm # this is a regex
       6 /432/gm # this is division
   )
-  }, children: [{tag: "div", attrs: {}, children: [{tag: "div", attrs: {}, children: [{tag: "div", attrs: {}, children: [{tag: "article", attrs: {"name": ( new Date() ), "number": 203,  \
+  }, [m("div", {}, [m("div", {}, [m("div", {}, [m("article", {"name": ( new Date() ), "number": 203,  \
      "range": (getRange())
-    }, children: []}]}]}]}]}
+    }, [])])])])])
 ##end
 
 
@@ -314,7 +314,7 @@ REGEX = /// ^
 ##expected
 test = /432/gm # this is a regex
 6 /432/gm # this is division
-m.component(Tag, {}, [(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
+m(Tag, {}, [(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
 """])
 Person
 REGEX = /// ^
@@ -380,7 +380,7 @@ escaped js within cmsx is ignored by parser
 ##input
 <Person> `i am not js` </Person>
 ##expected
-m.component(Person, {}, [" `i am not js` "])
+m(Person, {}, [" `i am not js` "])
 ##end
 
 ##desc
@@ -390,7 +390,7 @@ comment within cmsx is ignored by parser
 # i am not a comment
 </Person>
 ##expected
-m.component(Person, {}, ["""
+m(Person, {}, ["""
 # i am not a comment
 """])
 ##end
@@ -413,7 +413,7 @@ cs comment at start of cmsx escape
 }
 </Person>
 ##expected
-m.component(Person, {}, [(# i am a comment
+m(Person, {}, [(# i am a comment
   "i am a string"
 )])
 ##end
@@ -441,7 +441,7 @@ string within cmsx is ignored by parser and escaped
 ##input
 <Person> "i am not a string" 'nor am i' </Person>
 ##expected
-m.component(Person, {}, [" \"i am not a string\" \'nor am i\' "])
+m(Person, {}, [" \"i am not a string\" \'nor am i\' "])
 ##end
 
 ##desc
@@ -449,7 +449,7 @@ special chars within cmsx are ignored by parser and escaped
 ##input
 <Person> a,/';][' a\''@$%^&˚¬∑˜˚∆å∂¬˚*()*&^%$>><<<< '"''"'''\'\'m' i </Person>
 ##expected
-m.component(Person, {}, [" a,\x2F\';][\' a\\\'\'@$%^\&˚¬∑˜˚∆å∂¬˚*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "])
+m(Person, {}, [" a,\x2F\';][\' a\\\'\'@$%^\&˚¬∑˜˚∆å∂¬˚*()*\&^%$\x3E\x3E\x3C\x3C\x3C\x3C \'\"\'\'\"\'\'\'\\\'\\\'m\' i "])
 ##end
 
 ##desc
@@ -457,7 +457,7 @@ html entities (name, decimal, hex) within cmsx decoded
 ##input
 <Person>  &&&&euro;  &#8364; &#x20AC;;; </Person>
 ##expected
-m.component(Person, {}, ["  \&\&\&€  € €;; "])
+m(Person, {}, ["  \&\&\&€  € €;; "])
 ##end
 
 ##desc
@@ -465,7 +465,7 @@ tag with {{}}
 ##input
 <Person name={{value: item, key, item}} />
 ##expected
-m.component(Person, {"name": ({value: item, key, item})})
+m(Person, {"name": ({value: item, key, item})})
 ##end
 
 ##desc
@@ -497,7 +497,7 @@ self closing tag with spread attribute
 ##input
 <Component a={b} {... x } b="c" />
 ##expected
-m.component(Component, Object.assign({"a": (b)},  x , {"b": "c"}))
+m(Component, Object.assign({"a": (b)},  x , {"b": "c"}))
 ##end
 
 ##desc
@@ -505,7 +505,7 @@ complex spread attribute
 ##input
 <Component {...x} a={b} {... x } b="c" {...$my_xtraCoolVar123 } />
 ##expected
-m.component(Component, Object.assign({},  x, {"a": (b)},  x , {"b": "c"}, $my_xtraCoolVar123))
+m(Component, Object.assign({},  x, {"a": (b)},  x , {"b": "c"}, $my_xtraCoolVar123))
 ##end
 
 ##desc
@@ -515,7 +515,7 @@ multiline spread attribute
   x } a={b} {... x } b="c" {...z }>
 </Component>
 ##expected
-m.component(Component, Object.assign({},  
+m(Component, Object.assign({},  
   x , {"a": (b)},  x , {"b": "c"}, z))
 ##end
 
@@ -530,7 +530,7 @@ multiline tag with spread attribute
 >
 </Component>
 ##expected
-m.component(Component, Object.assign({ \
+m(Component, Object.assign({ \
   "z": "1"
   }, x, { \
   "a": (b),  \
@@ -549,7 +549,7 @@ multiline tag with spread attribute first
 >
 </Component>
 ##expected
-m.component(Component, Object.assign({}, \
+m(Component, Object.assign({}, \
   
   x, { \
   "z": "1",  \
@@ -567,9 +567,9 @@ complex multiline spread attribute
   <div code={someFunc({a:{b:{}, C:'}'}})} />
 </Component>
 ##expected
-m.component(Component, Object.assign({}, \
+m(Component, Object.assign({}, \
   
-  y, {"a": (b)},  x , {"b": "c"}, z), [{tag: "div", attrs: {"code": (someFunc({a:{b:{}, C:'}'}}))}, children: []}])
+  y, {"a": (b)},  x , {"b": "c"}, z), [m("div", {"code": (someFunc({a:{b:{}, C:'}'}}))}, [])])
 ##end
 
 ##desc
@@ -577,7 +577,7 @@ self closing spread attribute on single line
 ##input
 <Component a="b" c="d" {...@props} />
 ##expected
-m.component(Component, Object.assign({"a": "b", "c": "d"}, @props))
+m(Component, Object.assign({"a": "b", "c": "d"}, @props))
 ##end
 
 ##desc
@@ -589,7 +589,7 @@ self closing spread attribute on new line
   {...@props}
 />
 ##expected
-m.component(Component, Object.assign({ \
+m(Component, Object.assign({ \
   "a": "b",  \
   "c": "d"
   }, @props))
@@ -603,7 +603,7 @@ self closing spread attribute on same line
   c="d"
   {...@props} />
 ##expected
-m.component(Component, Object.assign({ \
+m(Component, Object.assign({ \
   "a": "b",  \
   "c": "d"
   }, @props))
@@ -619,7 +619,7 @@ self closing spread attribute on next line
 
 />
 ##expected
-m.component(Component, Object.assign({ \
+m(Component, Object.assign({ \
   "a": "b",  \
   "c": "d"
   }, @props))
@@ -631,8 +631,8 @@ Empty strings are not converted to true
 <Component val='' />
 <Component val="" />
 ##expected
-m.component(Component, {"val": ''})
-m.component(Component, {"val": ""})
+m(Component, {"val": ''})
+m(Component, {"val": ""})
 ##end
 
 ##desc
@@ -642,7 +642,7 @@ coffeescript @ syntax in tag name
   <Component />
 </@Component>
 ##expected
-m.component(@Component, {}, [Component])
+m(@Component, {}, [Component])
 ##end
 
 
@@ -651,7 +651,7 @@ custom element
 ##input
 <paper-button className="button">{text}</paper-button>
 ##expected
-{tag: "paper-button", attrs: {"className": "button"}, children: [(text)]}
+m("paper-button", {"className": "button"}, [(text)])
 ##end
 
 ##desc

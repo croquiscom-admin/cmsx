@@ -182,12 +182,12 @@ nodeSerialisers =
         if serialisedAttribute is '{}'
           element
         else
-          "m.component(#{element}, #{serialisedAttribute})"
+          "m(#{element}, #{serialisedAttribute})"
       else
-        "m.component(#{element}, #{serialisedAttribute}, [#{joinList(serialisedChildren)}])"
+        "m(#{element}, #{serialisedAttribute}, [#{joinList(serialisedChildren)}])"
     else
       element = '"'+node.value+'"'
-      "{tag: #{element}, attrs: #{serialisedAttribute}, children: [#{joinList(serialisedChildren)}]}"
+      "m(#{element}, #{serialisedAttribute}, [#{joinList(serialisedChildren)}])"
 
   CJSX_COMMENT: (node) ->
     ''
