@@ -15,7 +15,7 @@ self closing tag
 ##input
 <Person />
 ##expected
-Person
+m(Person)
 ##end
 
 ##desc
@@ -281,7 +281,7 @@ complex regex
 <Person />
 /\/\/<Person \/>\>\//
 ##expected
-Person
+m(Person)
 /\/\/<Person \/>\>\//
 ##end
 
@@ -316,7 +316,7 @@ test = /432/gm # this is a regex
 6 /432/gm # this is division
 m(Tag, {}, [(test = /<Tag>/), """ \x3C--this is a regex containing something which looks like a tag
 """])
-Person
+m(Person)
 REGEX = /// ^
   (/ (?! [\s=] )   # comment comment <comment>comment</comment>
   [^ [ / \n \\ ]*  # comment comment
@@ -332,7 +332,7 @@ REGEX = /// ^
   )*
   /) ([imgy]{0,4}) (?!\w)
 ///
-Person
+m(Person)
 ##end
 
 ##desc
@@ -401,7 +401,7 @@ empty node is handled as expected
 <Person>
 </Person>
 ##expected
-Person
+m(Person)
 ##end
 
 ##desc
@@ -425,7 +425,7 @@ cmsx comment is passed through
 {# i am a comment}
 </Person>
 ##expected
-Person
+m(Person)
 ##end
 
 ##desc
@@ -433,7 +433,7 @@ comment syntax can be used inline
 ##input
 <Person>{#comment inline}</Person>
 ##expected
-Person
+m(Person)
 ##end
 
 ##desc
@@ -473,7 +473,7 @@ tag with namespace
 ##input
 <Something.Tag></Something.Tag>
 ##expected
-Something.Tag
+m(Something.Tag)
 ##end
 
 ##desc
@@ -481,7 +481,7 @@ tag with lowercase namespace
 ##input
 <something.tag></something.tag>
 ##expected
-something.tag
+m(something.tag)
 ##end
 
 ##desc
@@ -489,7 +489,7 @@ self closing tag with namespace
 ##input
 <Something.Tag />
 ##expected
-Something.Tag
+m(Something.Tag)
 ##end
 
 ##desc
@@ -642,7 +642,7 @@ coffeescript @ syntax in tag name
   <Component />
 </@Component>
 ##expected
-m(@Component, {}, [Component])
+m(@Component, {}, [m(Component)])
 ##end
 
 
@@ -663,5 +663,5 @@ Don't get caught out by apostrophes.
 ##expected
 # Don't get caught out by apostrophes.
 
-    console.log A
+    console.log m(A)
 ##end

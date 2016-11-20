@@ -180,7 +180,7 @@ nodeSerialisers =
       element = node.value
       if serialisedChildren.length is 0
         if serialisedAttribute is '{}'
-          element
+          "m(#{element})"
         else
           "m(#{element}, #{serialisedAttribute})"
       else
