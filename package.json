@@ -1,7 +1,7 @@
 {
   "name": "cmsx",
   "description": "CoffeeScript MSX Transformer",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "keywords": [
     "coffeescript",
     "mithril",
